@@ -4,7 +4,7 @@ import * as DBService from "../../DB/db.service.js"
 import CryptoJS from "crypto-js"
 import { compareHash, generateHash } from "../../utils/security/hash.security.js";
 import { generateEncryption } from "../../utils/security/encryption.security.js";
-import jwt from "jsonwebtoken"
+import { generateToken } from "../../utils/security/token.security.js";
 
 
 export const login=asyncHandler(
@@ -19,12 +19,8 @@ export const login=asyncHandler(
       if(!match){
         return next(new Error("Invalid login Data",{cause:404}))
       }
-      const  access_token=jwt.sign({_id:user._id,isLoggedIn:true},"secret key 123",{
-       expiresIn:60*30
-      })
-      const refresh_token=jwt.sign({_id:user._id,isLoggedIn:true},"secret key 123456",{
-        expiresIn:'1y'
-      })
+      const access_token=await generateToken({payload:{_id:user._id,isLoggedIn:true},signature:"secret key 123",options:{expiresIn:"1h"}})
+      const refresh_token=await generateToken({payload:{_id:user._id,isLoggedIn:true},signature:"secret key 123",options:{expiresIn:'1y'}})
       return successResponse({res,data:{access_token,refresh_token}})
    
     

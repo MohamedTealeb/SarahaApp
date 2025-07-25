@@ -1,3 +1,6 @@
+import path from 'node:path'
+import * as dotenv from 'dotenv'
+dotenv.config({path:path.join('./src/config/.env.dev')})
 import express from 'express'
 import authController from './modules/auth/auth.controller.js'
 import userController from './modules/user/user.controller.js'
@@ -5,7 +8,7 @@ import connectDB from './DB/connection.db.js'
 import { globalErrorHandling } from './utils/response.js'
 export const  bootstrap=async()=>{
     const app=express()
-    const port=3000;
+    const port=process.env.PORT
     //DB
     await connectDB()
     app.use(express.json())
