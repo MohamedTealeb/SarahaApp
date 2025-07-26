@@ -7,7 +7,8 @@ const userSchema=new mongoose.Schema({
     gender:{type:String,enum:["male","female"],required:true,default:"male"},
     phone:{type:String,required:true},
     confirmEmail:{Date},
-
+    role:{type:String,enum:["user","admin"],default:"user"},
+    
 },{
     timestamps:true,
     toObject:{
