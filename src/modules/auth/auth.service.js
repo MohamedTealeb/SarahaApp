@@ -4,14 +4,13 @@ import * as DBService from "../../DB/db.service.js"
 import CryptoJS from "crypto-js"
 import { compareHash, generateHash } from "../../utils/security/hash.security.js";
 import { generateEncryption } from "../../utils/security/encryption.security.js";
-import { generateToken, getSignatures, signatureLevelEnum } from "../../utils/security/token.security.js";
-
-
+import { generateLogin, generateToken, getSignatures, signatureLevelEnum } from "../../utils/security/token.security.js";
+import { OAuth2Client } from "google-auth-library";
 export const login=asyncHandler(
     async(req,res,next)=>{
   
       const {email,password}=req.body
-    const user=await DBService.findOne({model:UserModel,filter:{email},select:"+password"})
+    const user=await DBService.findOne({model:UserModel,filter:{email,provider:"local"},select:"+password"})
       if(!user){
         return next(new Error("User not found",{cause:404}))
       }
@@ -19,21 +18,9 @@ export const login=asyncHandler(
       if(!match){
         return next(new Error("Invalid login Data",{cause:404}))
       }
-      
-      let signatures=await getSignatures({signatureLevel:user.role!="user"?signatureLevelEnum.System:signatureLevelEnum.Bearer})
-    
-      const access_token = generateToken({
-        payload: { _id: user._id, isLoggedIn: true },
-        signature: signatures.accessSignature,
-        secret: { expiresIn: "1h" }
-      });
-    
-      const refresh_token = generateToken({
-        payload: { _id: user._id, isLoggedIn: true },
-        secret: signatures.refreshSignature,
-        options: { expiresIn: "1y" }
-      });
-      return successResponse({res,data:{access_token,refresh_token}})
+      const credentials=await generateLogin({user})
+     
+      return successResponse({res,data:{credentials}})
    
     
 }
@@ -51,6 +38,63 @@ export const signup=asyncHandler(
             const encphone= await generateEncryption({plaintext:phone})
             const user=await DBService.create({model:UserModel,data:{fullName,email,password:hashedPassword,phone:encphone}})
             return successResponse({res,messsage:"User created successfully",status:201,data:user})
+          
+    }
+)
+
+async function verifyGoogleAccount(idToken) {
+  const client=new OAuth2Client()
+  async function verify() {
+      const ticket = await client.verifyIdToken({
+          idToken,
+          audience: "1002559808372-q5mf6iov72p0t4suc1bsbj32da8mqo64.apps.googleusercontent.com",
+      });
+      const payload = ticket.getPayload();
+      const userId = payload['sub'];
+      console.log(payload);
+      return payload
+  }
+}
+export const signupGmail=asyncHandler(
+    async(req,res,next)=>{
+      
+        const {idToken}=req.body
+        const {picture,email,name,emailVerified}=await verifyGoogleAccount(idToken)
+        if(!emailVerified){
+          return next(new Error("Email not verified",{cause:400}))
+        }
+        const user=await DBService.findOne({model:UserModel,filter:{email}})
+        if(user){
+          if(user.provider==="google"){
+           const credentials=await generateLogin({user})
+           return successResponse({res,data:{credentials}})
+          }
+          return next(new Error("User already exists",{cause:409}))
+        }
+        const newUser=await DBService.create({model:UserModel,data:{fullName:name,email,picture,confirmEmail:Date.now(),provider:"google"}})
+      
+     
+            return successResponse({res,messsage:"User created successfully",status:201,data:{newUser}})
+          
+    }
+)
+
+export const loginGmail=asyncHandler(
+    async(req,res,next)=>{
+      
+        const {idToken}=req.body
+        const {email,emailVerified}=await verifyGoogleAccount(idToken)
+        if(!emailVerified){
+          return next(new Error("Email not verified",{cause:400}))
+        }
+        const user=await DBService.findOne({model:UserModel,filter:{email,provider:"google"}})
+        if(!user){
+          return next(new Error("User not found",{cause:404}))
+        }
+        const credentials=await generateLogin({user})
+      
+     
+            return successResponse({res,data:{credentials}})
           
     }
 )

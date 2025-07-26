@@ -3,11 +3,17 @@ const userSchema=new mongoose.Schema({
     firstName:{type:String,required:true,minlength:3,maxlength:[20,"Too long name"]},
     lastName:{type:String,required:true,minlength:3,maxlength:[20,"Too long name"]},
     email:{type:String,required:true,unique:true},
-    password:{type:String,required:true},
-    gender:{type:String,enum:["male","female"],required:true,default:"male"},
-    phone:{type:String,required:true},
+    password:{type:String,required:function(){
+        return this.provider==="local"?true:false
+    }},
+    gender:{type:String,enum:["male","female"],default:"male"},
+    phone:{type:String,required:function(){
+        return this.provider==="local"?true:false
+    }},
     confirmEmail:{Date},
     role:{type:String,enum:["user","admin"],default:"user"},
+    picture:{type:String},
+    provider:{type:String,enum:["google","local"],default:"local"},
     
 },{
     timestamps:true,

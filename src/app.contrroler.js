@@ -6,9 +6,12 @@ import authController from './modules/auth/auth.controller.js'
 import userController from './modules/user/user.controller.js'
 import connectDB from './DB/connection.db.js'
 import { globalErrorHandling } from './utils/response.js'
+import cors from 'cors'
 export const  bootstrap=async()=>{
     const app=express()
     const port=process.env.PORT
+    //middleware
+    app.use(cors())
     //DB
     await connectDB()
     app.use(express.json())
