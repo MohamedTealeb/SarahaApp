@@ -7,6 +7,8 @@ import userController from './modules/user/user.controller.js'
 import connectDB from './DB/connection.db.js'
 import { globalErrorHandling } from './utils/response.js'
 import cors from 'cors'
+import nodemailer from 'nodemailer'
+import { sendEmail } from './utils/email/send.email.js'
 export const  bootstrap=async()=>{
     const app=express()
     const port=process.env.PORT
@@ -24,6 +26,10 @@ app.all('{/*dummy}',(req,res)=>{
     res.status(404).json({message:"Page not found"})
 })
 app.use(globalErrorHandling)
+
+
+await sendEmail({from:process.env.APP_EMAIL,to:"mohamedtealeb088@gmail.com ,	mohammedtealeb0155@gmail.com",subject:"Hello ✔",text:"Hello world moooooooo?",html:"<b>Hello world moooooooo?</b>",attachments:[{filename:"test.txt",content:"Hello world moooooooo?"}]})
+
 
     app.listen(port,()=>{
         console.log(`Example app listening on port ${port}`)

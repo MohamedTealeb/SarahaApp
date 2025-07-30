@@ -59,8 +59,8 @@ export const signupGmail=asyncHandler(
     async(req,res,next)=>{
       
         const {idToken}=req.body
-        const {picture,email,name,emailVerified}=await verifyGoogleAccount(idToken)
-        if(!emailVerified){
+        const {picture,email,name,email_Verified}=await verifyGoogleAccount(idToken)
+        if(!email_Verified){
           return next(new Error("Email not verified",{cause:400}))
         }
         const user=await DBService.findOne({model:UserModel,filter:{email}})

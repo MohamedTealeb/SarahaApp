@@ -9,6 +9,6 @@ return await model.findById(id).select(select).populate(populate)
 }
 export const create = async ({ model, data = {}, options = {} }) => {
     const doc = new model(data);
-    await doc.save(options); // يتم التحقق الكامل من الـ schema هنا
+    await doc.save(options); 
     return doc;
 };
