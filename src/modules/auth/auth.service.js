@@ -6,13 +6,26 @@ import { compareHash, generateHash } from "../../utils/security/hash.security.js
 import { generateEncryption } from "../../utils/security/encryption.security.js";
 import { generateLogin, generateToken, getSignatures, signatureLevelEnum } from "../../utils/security/token.security.js";
 import { OAuth2Client } from "google-auth-library";
+import { sendEmail } from "../../utils/email/send.email.js";
+import { emailEvent } from "../../utils/events/email.event.js";
+import { customAlphabet, nanoid } from "nanoid";
+import Joi from "joi"
+import * as validators from "./auth.validation.js";
+
 export const login=asyncHandler(
     async(req,res,next)=>{
-  
+      const validationResult=validators.login.validate({email,password})
+      if(validationResult.error){
+        return next(new Error(validationResult.error,{cause:400}))
+      }
+
       const {email,password}=req.body
     const user=await DBService.findOne({model:UserModel,filter:{email,provider:"local"},select:"+password"})
       if(!user){
         return next(new Error("User not found",{cause:404}))
+      }
+      if(!user.confirmEmail){
+        return next(new Error("pls confirmed your email",{cause:409}))
       }
       const match=compareHash({plaintext:password,hash:user.password})
       if(!match){
@@ -29,14 +42,23 @@ export const login=asyncHandler(
 export const signup=asyncHandler(
     async(req,res,next)=>{
       
-            const {fullName,email,password,phone}=req.body
+          
+            const validationResult=validators.signup.validate({fullName,email,password})
+           if(validationResult.error){
+            return next(new Error(validationResult.error,{cause:400}))
+           }
+           const {fullName,email,password,phone}=req.body
           
             if( await DBService.findOne({model:UserModel,filter:{email}})){
               return next(new Error("User already exists",{cause:409}))
             }
             const hashedPassword=await generateHash({plaintext:password})
-            const encphone= await generateEncryption({plaintext:phone})
-            const user=await DBService.create({model:UserModel,data:{fullName,email,password:hashedPassword,phone:encphone}})
+           const encphone= await generateEncryption({plaintext:phone})
+           const otp=customAlphabet("0123456789",6)()
+           const confirmEmailOtp=await generateHash({plaintext:otp})
+           const user=await DBService.create({model:UserModel,data:{fullName,email,password:hashedPassword,phone:encphone,confirmEmailOtp}})
+       
+  emailEvent.emit("confirmEmail",{to:email,otp:otp})
             return successResponse({res,messsage:"User created successfully",status:201,data:user})
           
     }
@@ -99,3 +121,24 @@ export const loginGmail=asyncHandler(
     }
 )
 
+export const  confirmEmail=asyncHandler(
+  async(req,res,next)=>{
+    
+          const {email,otp}=req.body
+        const user=await DBService.findOne({model:UserModel,filter:{email,confirmEmail:{$exists:false},
+        confirmEmailOtp:{$exists:true}
+        }})
+        if(!user){
+          return next(new Error("nIn-valid acc or already verified",{cause:404}))
+        }
+        if(!await compareHash({plaintext:otp,hash:user.confirmEmailOtp})){
+          return next(new Error("Invalid otp",{cause:400}))
+        }
+ const updatedUser= await DBService.updateOne({model:UserModel,filter:{email},data:{confirmEmail:Date.now(),$unset:{confirmEmailOtp:true},$inc:{_v:1}}})
+       
+        
+          return updatedUser.matchedCount? successResponse({res,messsage:"User created successfully",status:201,data:{}})
+          :next(new Error("faild to confirm email",{cause:404}))
+        
+  }
+)

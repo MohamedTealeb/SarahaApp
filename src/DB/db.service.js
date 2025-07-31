@@ -12,3 +12,7 @@ export const create = async ({ model, data = {}, options = {} }) => {
     await doc.save(options); 
     return doc;
 };
+export const updateOne = async ({ model, filter = {}, data = {}, options = {runValidators:true} }={} ) => {
+    
+    return await model.updateOne(filter,data,options);
+};

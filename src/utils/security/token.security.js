@@ -39,6 +39,9 @@ export  const verifyToken=({ token = "", signature = process.env.ACCESS_USER_TOK
   }
   export const decodedToken=async({next,authorization="",tokenType=tokenTypeEnum.Access}={})=>{
     const [bearer,token]=authorization?.split(" ")||[]
+    
+    console.log("AUTHORIZATION HEADER:", authorization);
+
     if(!bearer||!token){
         return next(new Error("missing token",{cause:401}))
     }
@@ -52,6 +55,7 @@ export  const verifyToken=({ token = "", signature = process.env.ACCESS_USER_TOK
     if(!user){
         return next(new Error("User not found",{cause:404}))
     }
+    
     return {user,decoded}
   }
   export const generateLogin=async({user})=>{

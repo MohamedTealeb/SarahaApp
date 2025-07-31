@@ -28,7 +28,7 @@ app.all('{/*dummy}',(req,res)=>{
 app.use(globalErrorHandling)
 
 
-await sendEmail({from:process.env.APP_EMAIL,to:"mohamedtealeb088@gmail.com ,	mohammedtealeb0155@gmail.com",subject:"Hello ✔",text:"Hello world moooooooo?",html:"<b>Hello world moooooooo?</b>",attachments:[{filename:"test.txt",content:"Hello world moooooooo?"}]})
+// await sendEmail({from:process.env.APP_EMAIL,to:"mohamedtealeb088@gmail.com ,	mohammedtealeb0155@gmail.com",subject:"Hello ✔",text:"Hello world moooooooo?",html:"<b>Hello world moooooooo?</b>",attachments:[{filename:"test.txt",content:"Hello world moooooooo?"}]})
 
 
     app.listen(port,()=>{

@@ -14,6 +14,7 @@ const userSchema=new mongoose.Schema({
     role:{type:String,enum:["user","admin"],default:"user"},
     picture:{type:String},
     provider:{type:String,enum:["google","local"],default:"local"},
+    confirmEmailOtp:{type:String},
     
 },{
     timestamps:true,
