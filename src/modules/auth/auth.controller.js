@@ -1,4 +1,4 @@
-import* as validators from "../../middleware/validation.middleware.js";
+import* as validators from "./auth.validation.js";
 import*as authService from "./auth.service.js"
 import {Router} from "express";
 import { validation } from "../../middleware/validation.middleware.js";

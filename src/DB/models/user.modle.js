@@ -10,11 +10,14 @@ const userSchema=new mongoose.Schema({
     phone:{type:String,required:function(){
         return this.provider==="local"?true:false
     }},
-    confirmEmail:{Date},
+    confirmEmail:{type:Date},
     role:{type:String,enum:["user","admin"],default:"user"},
     picture:{type:String},
     provider:{type:String,enum:["google","local"],default:"local"},
     confirmEmailOtp:{type:String},
+    freezeAt:{type:Date},
+    freezeBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
+    oldPassword:[{type:String}],
     
 },{
     timestamps:true,

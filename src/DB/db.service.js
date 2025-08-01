@@ -16,3 +16,11 @@ export const updateOne = async ({ model, filter = {}, data = {}, options = {runV
     
     return await model.updateOne(filter,data,options);
 };
+export const findOneAndUpdate = async ({ model, filter = {}, data = {},select="",populate=[], options = {runValidators:true,new:true }}={} ) => {
+    
+    return await model.findOneAndUpdate(filter,data,{...options,select,populate});
+};
+export const deleteOne = async ({ model, filter = {}, options = {} }={} ) => {
+    
+    return await model.deleteOne(filter,options);
+};

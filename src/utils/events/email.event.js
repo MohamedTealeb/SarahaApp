@@ -4,7 +4,7 @@ import { verifyEmailTemplate } from "../email/templete/verify.emai.template.js"
 export const emailEvent=new EventEmitter()
 emailEvent.on("confirmEmail",async(data)=>{
     await sendEmail({
-        to: data.to, // <-- ERROR HERE
+        to: data.to,
         subject: data.subject || "Verify your email",
         text: data.text || "Please verify your email",
         html: verifyEmailTemplate({ otp: data.otp })

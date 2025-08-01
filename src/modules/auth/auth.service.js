@@ -10,17 +10,11 @@ import { sendEmail } from "../../utils/email/send.email.js";
 import { emailEvent } from "../../utils/events/email.event.js";
 import { customAlphabet, nanoid } from "nanoid";
 import Joi from "joi"
-import * as validators from "./auth.validation.js";
 
 export const login=asyncHandler(
     async(req,res,next)=>{
-      const validationResult=validators.login.validate({email,password})
-      if(validationResult.error){
-        return next(new Error(validationResult.error,{cause:400}))
-      }
-
       const {email,password}=req.body
-    const user=await DBService.findOne({model:UserModel,filter:{email,provider:"local"},select:"+password"})
+      const user=await DBService.findOne({model:UserModel,filter:{email,provider:"local"},select:"+password"})
       if(!user){
         return next(new Error("User not found",{cause:404}))
       }
@@ -42,47 +36,43 @@ export const login=asyncHandler(
 export const signup=asyncHandler(
     async(req,res,next)=>{
       
+        const {fullName,email,password,phone}=req.body
           
-            const validationResult=validators.signup.validate({fullName,email,password})
-           if(validationResult.error){
-            return next(new Error(validationResult.error,{cause:400}))
-           }
-           const {fullName,email,password,phone}=req.body
-          
-            if( await DBService.findOne({model:UserModel,filter:{email}})){
-              return next(new Error("User already exists",{cause:409}))
-            }
-            const hashedPassword=await generateHash({plaintext:password})
-           const encphone= await generateEncryption({plaintext:phone})
-           const otp=customAlphabet("0123456789",6)()
-           const confirmEmailOtp=await generateHash({plaintext:otp})
-           const user=await DBService.create({model:UserModel,data:{fullName,email,password:hashedPassword,phone:encphone,confirmEmailOtp}})
+        if( await DBService.findOne({model:UserModel,filter:{email}})){
+            return next(new Error("User already exists",{cause:409}))
+        }
+        const hashedPassword=await generateHash({plaintext:password})
+        const encphone= await generateEncryption({plaintext:phone})
+        const otp=customAlphabet("0123456789",6)()
+        const confirmEmailOtp=await generateHash({plaintext:otp})
+        const user=await DBService.create({model:UserModel,data:{fullName,email,password:hashedPassword,phone:encphone,confirmEmailOtp}})
        
-  emailEvent.emit("confirmEmail",{to:email,otp:otp})
-            return successResponse({res,messsage:"User created successfully",status:201,data:user})
+        emailEvent.emit("confirmEmail",{to:email,otp:otp})
+        return successResponse({res,messsage:"User created successfully",status:201,data:user})
           
     }
 )
 
 async function verifyGoogleAccount(idToken) {
   const client=new OAuth2Client()
-  async function verify() {
+  try {
       const ticket = await client.verifyIdToken({
           idToken,
           audience: "1002559808372-q5mf6iov72p0t4suc1bsbj32da8mqo64.apps.googleusercontent.com",
       });
       const payload = ticket.getPayload();
-      const userId = payload['sub'];
       console.log(payload);
       return payload
+  } catch (error) {
+      throw new Error("Invalid Google token")
   }
 }
 export const signupGmail=asyncHandler(
     async(req,res,next)=>{
       
         const {idToken}=req.body
-        const {picture,email,name,email_Verified}=await verifyGoogleAccount(idToken)
-        if(!email_Verified){
+        const {picture,email,name,email_verified}=await verifyGoogleAccount(idToken)
+        if(!email_verified){
           return next(new Error("Email not verified",{cause:400}))
         }
         const user=await DBService.findOne({model:UserModel,filter:{email}})
@@ -105,8 +95,8 @@ export const loginGmail=asyncHandler(
     async(req,res,next)=>{
       
         const {idToken}=req.body
-        const {email,emailVerified}=await verifyGoogleAccount(idToken)
-        if(!emailVerified){
+        const {email,email_verified}=await verifyGoogleAccount(idToken)
+        if(!email_verified){
           return next(new Error("Email not verified",{cause:400}))
         }
         const user=await DBService.findOne({model:UserModel,filter:{email,provider:"google"}})

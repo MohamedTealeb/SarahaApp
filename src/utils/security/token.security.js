@@ -47,7 +47,8 @@ export  const verifyToken=({ token = "", signature = process.env.ACCESS_USER_TOK
     }
     const normalizedSignatureLevel = bearer === "System" ? signatureLevelEnum.System : signatureLevelEnum.Bearer;
 
-    let signatures = await getSignatures({ signatureLevel: normalizedSignatureLevel });    const decoded=await verifyToken({token,signature:tokenType===tokenTypeEnum.Access?signatures.accessSignature:signatures.refreshSignature})
+    let signatures = await getSignatures({ signatureLevel: normalizedSignatureLevel });
+    const decoded=await verifyToken({token,signature:tokenType===tokenTypeEnum.Access?signatures.accessSignature:signatures.refreshSignature})
     if(!decoded?._id){
         return next(new Error("Invalid token",{cause:400}))
     }

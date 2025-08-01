@@ -3,19 +3,21 @@ import { generalFields } from "../../middleware/validation.middleware.js"
 export const login={
     body:Joi.object().keys({
         email:generalFields.email.required(),
-        password:generalFields.password.required(),
+        password:generalFields.password.required(),  
     }).required()
 }
 
 
 
 export const signup={
-    body:Joi.object().keys(login).append({
+    body:Joi.object().keys({
+        email:generalFields.email.required(),
+        password:generalFields.password.required(),
         fullName:generalFields.fullName.required(),
-        confirmPassword:generalFields.confirmPassword.required(),
-        phone:generalFields.phone.required(),
+        // confirmPassword:generalFields.confirmPassword.required(),
+        phone:generalFields.phone
     }).required(),
-    Query:Joi.object().keys({
+    query:Joi.object().keys({
         lang:Joi.string().valid("ar","en").required()
     })
 
