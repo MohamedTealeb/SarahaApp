@@ -126,7 +126,8 @@ export const  confirmEmail=asyncHandler(
     
           const {email,otp}=req.body
         const user=await DBService.findOne({model:UserModel,filter:{email,confirmEmail:{$exists:false},
-        confirmEmailOtp:{$exists:true}
+        confirmEmailOtp:{$exists:true},
+        provider:"local"
         }})
         if(!user){
           return next(new Error("nIn-valid acc or already verified",{cause:404}))

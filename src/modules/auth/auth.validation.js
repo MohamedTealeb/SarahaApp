@@ -31,3 +31,8 @@ export const loginGmail={
         idToken:Joi.string().required(),
     }).required()
 }
+export const signupGmail={
+    body:Joi.object().keys({
+        idToken:Joi.string().token().required(),
+    }).required()
+}
