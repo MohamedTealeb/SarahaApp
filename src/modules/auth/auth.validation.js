@@ -38,3 +38,22 @@ export const signupGmail={
         idToken:Joi.string().token().required(),
     }).required()
 }
+export const sendForgotPassword={
+    body:Joi.object().keys({
+        email:generalFields.email.required(),
+    }).required()
+}
+export const verifyForgotPassword={
+    body:Joi.object().keys({
+        email:generalFields.email.required(),
+        otp:generalFields.otp.required(),
+    }).required()
+}
+export const resetForgotPassword={
+    body:Joi.object().keys({
+        email:generalFields.email.required(),
+        otp:generalFields.otp.required(),
+        password:generalFields.password.required(),
+        confirmPassword:generalFields.confirmPassword.required(),
+    }).required()
+}

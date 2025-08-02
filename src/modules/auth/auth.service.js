@@ -10,6 +10,7 @@ import { sendEmail } from "../../utils/email/send.email.js";
 import { emailEvent } from "../../utils/events/email.event.js";
 import { customAlphabet, nanoid } from "nanoid";
 import Joi from "joi"
+import { verifyEmailTemplate } from "../../utils/email/templete/verify.emai.template.js";
 
 export const login=asyncHandler(
     async(req,res,next)=>{
@@ -133,3 +134,96 @@ export const  confirmEmail=asyncHandler(
         
   }
 )
+export const sendForgotPassword=asyncHandler(async(req,res,next)=>{
+
+  const {email}=req.body
+  const otp=customAlphabet("0123456789",6)()
+  const hashOtp=await generateHash({plaintext:otp})
+  const user=await DBService.findOneAndUpdate({
+model:UserModel,
+filter:{email},
+freezeAt:{$exists:false},
+confirmEmail:{$exists:true},
+data:{
+
+  forgotCode:hashOtp,
+  $inc:{__v:1}
+}
+
+})
+if(!user){
+  return next(new Error("invalid acc",{cause:404}))
+}
+
+  
+  emailEvent.emit("forgotPassword",{to:email,subject:"forgot-password",html:verifyEmailTemplate({otp,title:"Reset Code"})})
+return successResponse({res,data:{}})
+
+
+})
+
+export const verifyForgotPassword=asyncHandler(async(req,res,next)=>{
+const {email,otp}=req.body
+const user=await DBService.findOne({
+  
+model:UserModel,
+filter:{
+  email,
+  freezeAt:{$exists:false},
+  confirmEmail:{$exists:true},
+  forgotCode:{$exists:true}
+
+},
+
+})
+
+if(!user){
+  return next(new Error("invalid acc",{cause:404}))
+}
+if(!await compareHash({plaintext:otp,hash:user.forgotCode})){
+  return next(new Error("Invalid otp",{cause:400}))
+}
+return successResponse({res,data:{}})
+}
+)
+export const resetForgotPassword=asyncHandler(async(req,res,next)=>{
+const {email,otp,password}=req.body
+const user=await DBService.findOne({
+  
+model:UserModel,
+filter:{
+  email,
+  freezeAt:{$exists:false},
+  // confirmEmail:{$exists:true},
+  forgotCode:{$exists:true}
+
+},
+
+})
+
+if(!user){
+  return next(new Error("invalid acc",{cause:404}))
+}
+if(!await compareHash({plaintext:otp,hash:user.forgotCode})){
+  return next(new Error("Invalid otp",{cause:400}))
+}
+const hashedPassword=await generateHash({plaintext:password})
+await DBService.updateOne({model:UserModel,filter:{email},
+  data:{ 
+    $set:{
+      password:hashedPassword,
+      changeLoginCredentials:Date.now(),
+
+      $unset:{forgotCode:true}
+      ,$inc:{__v:1}
+
+    }
+    
+  }})
+    
+    
+return successResponse({res,data:{}})
+}
+)
+
+  

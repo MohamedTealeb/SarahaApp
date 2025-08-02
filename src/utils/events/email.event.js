@@ -13,4 +13,8 @@ emailEvent.on("confirmEmail",async(data)=>{
       });
     })
 
-  
+  emailEvent.on("forgotPassword",async(data)=>{
+
+const result=await sendEmail(data).catch
+  })
+    

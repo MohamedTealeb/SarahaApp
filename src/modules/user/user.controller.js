@@ -17,4 +17,5 @@ router.patch("/:userId/restore",auth.authentication(),validation(validators.rest
 router.delete("/harddelete",auth.authentication(),userService.harddeleteAccount)
 router.delete("/:userId/harddelete",auth.authentication(),validation(validators.harddeleteAccount),userService.harddeleteAccount)
 router.patch("/password",auth.authentication(),validation(validators.updatePassword),userService.updatePassword)
+router.post("/logout",auth.authentication(),userService.logout)
 export default router

@@ -8,4 +8,7 @@ router.patch('/confirm-email',validation(validators.confirmEmail),authService.co
 router.post('/signup/gmail',validation(validators.signupGmail),authService.signupGmail)
 router.post('/login',validation(validators.login),authService.login)
 router.post('/login/gmail',validation(validators.loginGmail),authService.loginGmail)
+router.patch("/send-forgot-password",validation(validators.sendForgotPassword),authService.sendForgotPassword)
+router.patch("/verify-forgot-password",validation(validators.verifyForgotPassword),authService.verifyForgotPassword)
+router.patch("/reset-forgot-password",validation(validators.resetForgotPassword),authService.resetForgotPassword)
 export default router

@@ -36,9 +36,8 @@ export const harddeleteAccount={
 export const updatePassword={
 
   body:Joi.object().keys({
-  oldPassword:generalFields.password.required(),
-   password:generalFields.password.not(Joi.ref("oldPassword")).required(),
-    confirmPassword:generalFields.confirmPassword.required(),
+  currentPassword:generalFields.password.required(),
+   newPassword:generalFields.password.not(Joi.ref("currentPassword")).required(),
   }).required()
 }
 

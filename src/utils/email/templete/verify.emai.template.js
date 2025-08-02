@@ -1,4 +1,4 @@
-export const verifyEmailTemplate=({otp,title="Email Confirmation"}={})=>{
+export const verifyEmailTemplate=({otp,title="Comfirm Code"}={})=>{
     return `<!DOCTYPE html>
                 <html>
                 <head>
