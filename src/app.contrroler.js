@@ -17,6 +17,7 @@ export const  bootstrap=async()=>{
     //DB
     await connectDB()
     app.use(express.json())
+    app.use("/uploads",express.static(path.resolve("./src/uploads")))
     app.get('/',(req,res)=>{
         res.json("Our API")
     })

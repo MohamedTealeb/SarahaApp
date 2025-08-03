@@ -116,3 +116,23 @@ export const logout=asyncHandler(async(req,res,next)=>{
   })
   return successResponse({res,data:{}})
 })
+export const ProfileImage = asyncHandler(async (req, res, next) => {
+   let cover = [];
+ 
+   for (const file of req.files) { // ✅ استخدم req.files مش req.file
+     cover.push(file.finalpath); // تأكد إن الميدل وير بيضيف finalpath
+   }
+ 
+   const user = await DBService.findOneAndUpdate({
+     model: UserModel,
+     filter: { _id: req.user._id },
+     data: { cover },
+   });
+ 
+   return successResponse({
+     res,
+     message: "Profile images updated successfully",
+     data: { cover, userId: user._id },
+   });
+ });
+ 

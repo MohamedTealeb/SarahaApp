@@ -20,6 +20,7 @@ const userSchema=new mongoose.Schema({
     freezeBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
     restoredBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
     changeLoginCredentials:{type:Date,default:Date.now},
+    cover:{type:[String]},
   
     
     
