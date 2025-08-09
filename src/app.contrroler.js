@@ -9,6 +9,7 @@ import { globalErrorHandling } from './utils/response.js'
 import cors from 'cors'
 import nodemailer from 'nodemailer'
 import { sendEmail } from './utils/email/send.email.js'
+import { scheduleCleanupJobs } from './utils/cron/cleanup.cron.js'
 export const  bootstrap=async()=>{
     const app=express()
     const port=process.env.PORT
@@ -16,6 +17,8 @@ export const  bootstrap=async()=>{
     app.use(cors())
     //DB
     await connectDB()
+    // Schedule recurring maintenance tasks (e.g., delete stale unverified users)
+    scheduleCleanupJobs()
     app.use(express.json())
     app.use("/uploads",express.static(path.resolve("./src/uploads")))
     app.get('/',(req,res)=>{

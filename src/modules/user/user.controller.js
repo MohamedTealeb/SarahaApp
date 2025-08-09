@@ -11,8 +11,16 @@ router.get('/refresh-token',auth.auth({tokenType:tokenTypeEnum.Refresh}),userSer
 router.get('/',auth.auth({accessRoles:["user","admin"]}),userService.profile)
 router.get('/:userId/profile',validation(validators.shareProfile),userService .Shareprofile)
 router.patch("/",auth.authentication(),validation(validators.updateProfile),userService.updateProfile)
-router.patch("/image",auth.authentication(),localFileUpload({customPath:"user",fileValidation:fileValidators.image}).array("attchment",2),userService.ProfileImage)
-router.delete("/freeze",auth.authentication(),userService.freezeAccount)
+router.patch(
+    "/image",
+    auth.authentication(),
+    localFileUpload({
+      customPath: "user",
+      fileValidation: fileValidators.image
+    }).array("attchment", 2),
+    userService.ProfileImage
+  );
+  router.delete("/freeze",auth.authentication(),userService.freezeAccount)
 router.delete("/:userId/freeze",auth.authentication(),validation(validators.freezeAccount),userService.freezeAccount)
 router.patch("/restore",auth.authentication(),userService.restoreAccount)
 router.patch("/:userId/restore",auth.authentication(),validation(validators.restoreAccount),userService.restoreAccount)
