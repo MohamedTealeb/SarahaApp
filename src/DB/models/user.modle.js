@@ -12,7 +12,7 @@ const userSchema=new mongoose.Schema({
     }},
     confirmEmail:{Date},
     role:{type:String,enum:["user","admin"],default:"user"},
-    picture:{type:String},
+    picture:{secure_url:String,public_id:String},
     provider:{type:String,enum:["google","local"],default:"local"},
     confirmEmailOtp:{type:String},
     forgotCode:{type:String},

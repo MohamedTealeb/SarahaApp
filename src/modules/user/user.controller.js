@@ -1,6 +1,6 @@
 import * as auth from "../../middleware/authentication.middleware.js";
 import { validation } from "../../middleware/validation.middleware.js";
-import {  localFileUpload } from "../../utils/multer/local.multer.js";
+import {  cloudFileUpload } from "../../utils/multer/cLoud.multer.js";
 import { tokenTypeEnum } from "../../utils/security/token.security.js";
 import*as userService from "./user.service.js"
 import*as validators from "./user.validation.js"
@@ -14,11 +14,9 @@ router.patch("/",auth.authentication(),validation(validators.updateProfile),user
 router.patch(
     "/image",
     auth.authentication(),
-    localFileUpload({
-      customPath: "user",
-     
-      maxFileSizeMB: 2
-    }).array("attachment", 2),
+    cloudFileUpload({
+    validation:["image/jpeg","image/png","image/jpg"]
+    }).single("attachment"),validation(validators.updateProfileImage),
     userService.ProfileImage
   );
   router.delete("/freeze",auth.authentication(),userService.freezeAccount)

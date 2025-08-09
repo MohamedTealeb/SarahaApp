@@ -6,6 +6,7 @@ import { compareHash, generateHash } from "../../utils/security/hash.security.js
 import * as DBService from "../../DB/db.service.js"
 import { UserModel } from "../../DB/models/user.modle.js"
 import { RevokeTokenModel } from "../../DB/models/revoke.token.model.js"
+import { cloud, uploadFile } from "../../utils/multer/cloudinary.js"
 export const profile=asyncHandler(async(req,res,next)=>{
    
    
@@ -117,24 +118,22 @@ export const logout=asyncHandler(async(req,res,next)=>{
   return successResponse({res,data:{}})
 })
 export const ProfileImage = asyncHandler(async (req, res, next) => {
-   const cover = [];
- 
-   if (Array.isArray(req.files)) {
-     for (const file of req.files) {
-       cover.push(file.finalpath);
-     }
+  
+const {secure_url,public_id}=await uploadFile({file:req.file,path:`user/${req.user._id}`})
+const user=await DBService.findOneAndUpdate({model:UserModel,filter:{_id:req.user._id},
+   data:{picture:{secure_url,public_id},$inc:{__v:1}},
+   options:{
+      new:false
    }
- 
-   const user = await DBService.findOneAndUpdate({
-     model: UserModel,
-     filter: { _id: req.user._id },
-     data: { cover },
-   });
- 
+
+})
+if(user?.picture?.public_id){
+await destroyFile({public_id:user.picture.public_id})
+}
    return successResponse({
      res,
      message: "Profile images updated successfully",
-     data: { cover, userId: user._id },
+     data: { user },
    });
  });
  

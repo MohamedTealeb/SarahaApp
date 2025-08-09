@@ -41,3 +41,15 @@ export const updatePassword={
   }).required()
 }
 
+export const updateProfileImage={
+    file:Joi.object().keys({
+      fieldname:Joi.string(),
+      originalname:Joi.string(),
+      encoding:Joi.string(),
+      destination:Joi.string(),
+      filename:Joi.string(),
+      path:Joi.string(),
+      size:Joi.number(),
+      mimetype:Joi.string(),
+    }).required()
+}
