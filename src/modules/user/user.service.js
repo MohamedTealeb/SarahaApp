@@ -117,10 +117,12 @@ export const logout=asyncHandler(async(req,res,next)=>{
   return successResponse({res,data:{}})
 })
 export const ProfileImage = asyncHandler(async (req, res, next) => {
-   let cover = [];
+   const cover = [];
  
-   for (const file of req.files) { // ✅ استخدم req.files مش req.file
-     cover.push(file.finalpath); // تأكد إن الميدل وير بيضيف finalpath
+   if (Array.isArray(req.files)) {
+     for (const file of req.files) {
+       cover.push(file.finalpath);
+     }
    }
  
    const user = await DBService.findOneAndUpdate({
