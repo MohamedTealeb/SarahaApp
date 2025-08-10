@@ -6,7 +6,7 @@ import*as userService from "./user.service.js"
 import*as validators from "./user.validation.js"
 import {Router} from "express";
 
-const router=Router()
+const router=Router({caseSensitive:true,strict:true})
 router.get('/refresh-token',auth.auth({tokenType:tokenTypeEnum.Refresh}),userService.getNewLogin)
 router.get('/',auth.auth({accessRoles:["user","admin"]}),userService.profile)
 router.get('/:userId/profile',validation(validators.shareProfile),userService .Shareprofile)

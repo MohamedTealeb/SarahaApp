@@ -7,8 +7,7 @@ import userController from './modules/user/user.controller.js'
 import connectDB from './DB/connection.db.js'
 import { globalErrorHandling } from './utils/response.js'
 import cors from 'cors'
-import nodemailer from 'nodemailer'
-import { sendEmail } from './utils/email/send.email.js'
+import messageController from'./modules/message/message.controller.js'
 import { scheduleCleanupJobs } from './utils/cron/cleanup.cron.js'
 export const  bootstrap=async()=>{
     const app=express()
@@ -26,6 +25,7 @@ export const  bootstrap=async()=>{
     })
     app.use('/auth',authController)
     app.use('/user',userController)
+    app.use('/message',messageController)
 app.all('{/*dummy}',(req,res)=>{
     res.status(404).json({message:"Page not found"})
 })

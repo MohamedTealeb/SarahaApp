@@ -39,5 +39,15 @@ userSchema.virtual("fullName").set(function(value){
 }).get(function(){
     return `${this.firstName} ${this.lastName}`
 })
+userSchema.virtual("messages",{
+    
+    localField:"_id",
+    foreignField:"receiverdBy",
+    ref:"Message"
+}
+
+
+)
+ 
 export const UserModel=mongoose.models.User||mongoose.model("User",userSchema)
 UserModel.syncIndexes()

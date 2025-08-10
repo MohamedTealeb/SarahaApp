@@ -9,10 +9,20 @@ import { RevokeTokenModel } from "../../DB/models/revoke.token.model.js"
 import { cloud, uploadFile } from "../../utils/multer/cloudinary.js"
 export const profile=asyncHandler(async(req,res,next)=>{
    
-   
+   const user=await DBService.findOne({
+      model:UserModel,
+      filter:{
+         _id:req.user._id
+      },
+      populate:[
+         {
+            path:"messages"
+         }
+      ]
+   })
    req.user.phone=await decryptEncryption({ciphertext:req.user.phone})
    
-    return successResponse({res,message:"User profile",status:200,data:{user:req.user}})
+    return successResponse({res,message:"User profile",status:200,data:{user}})
 })
 export const Shareprofile=asyncHandler(async(req,res,next)=>{
    
