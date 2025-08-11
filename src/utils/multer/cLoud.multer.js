@@ -8,10 +8,14 @@ export const cloudFileUpload=({validation=[]}={})=>{
    
   
       function fileFilter(req, file, callback) {
+      // If no validation mimetypes provided, accept all files
+      if (!validation || validation.length === 0) {
+        return callback(null, true);
+      }
       if (validation.includes(file.mimetype)) {
         return callback(null, true);
       }
-     return callback("invalid file type", false);
+      return callback(new Error("invalid file type"), false);
     };
   
     return multer({

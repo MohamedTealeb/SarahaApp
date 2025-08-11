@@ -42,7 +42,7 @@ userSchema.virtual("fullName").set(function(value){
 userSchema.virtual("messages",{
     
     localField:"_id",
-    foreignField:"receiverdBy",
+    foreignField:"receivedBy",
     ref:"Message"
 }
 

@@ -9,11 +9,21 @@ import { globalErrorHandling } from './utils/response.js'
 import cors from 'cors'
 import messageController from'./modules/message/message.controller.js'
 import { scheduleCleanupJobs } from './utils/cron/cleanup.cron.js'
+import {rateLimit}from 'express-rate-limit'
+import morgan from 'morgan'
 export const  bootstrap=async()=>{
     const app=express()
     const port=process.env.PORT
     //middleware
+ 
     app.use(cors())
+    app.use(morgan('combined'))
+    const limiter=rateLimit({
+        windowMs:15*60*1000,
+        limit:100,
+       
+    })
+    app.use('/auth',limiter)
     //DB
     await connectDB()
     // Schedule recurring maintenance tasks (e.g., delete stale unverified users)

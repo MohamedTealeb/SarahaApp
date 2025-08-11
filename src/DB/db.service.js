@@ -7,6 +7,15 @@ return await model.findOne(filter).select(select).populate(populate)
 export const  findById=async({model,id,select="",populate=[]}={})=>{
 return await model.findById(id).select(select).populate(populate)
 }
+export const find = async ({ model, filter = {}, select = "", sort = { createdAt: -1 }, populate = [], limit = 0, skip = 0 } = {}) => {
+    return await model
+        .find(filter)
+        .select(select)
+        .sort(sort)
+        .populate(populate)
+        .limit(limit)
+        .skip(skip);
+};
 export const create = async ({ model, data = {}, options = {} }) => {
     const doc = new model(data);
     await doc.save(options); 
